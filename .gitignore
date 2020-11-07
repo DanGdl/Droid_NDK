@@ -1,0 +1,9 @@
+/.gradle/
+/.idea/
+/.settings/
+/gradle/wrapper/gradle-wrapper.jar
+/.classpath
+/.cproject
+/.project
+/import-summary.txt
+/local.properties
