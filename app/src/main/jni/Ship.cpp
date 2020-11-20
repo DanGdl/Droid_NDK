@@ -1,5 +1,5 @@
-#include "Log.hpp"
 #include "Ship.hpp"
+#include "Log.hpp"
 
 static const float INITIAL_X = 0.5f;
 static const float INITIAL_Y = 0.25f;
@@ -8,7 +8,7 @@ Ship::Ship(android_app *pApplication, GraphicsManager &pGraphicsManager) :
         mGraphicsManager(pGraphicsManager), mGraphics(NULL) {
 }
 
-void Ship::registerShip(GraphicsElement *pGraphics) {
+void Ship::registerShip(Sprite *pGraphics) {
     mGraphics = pGraphics;
 }
 

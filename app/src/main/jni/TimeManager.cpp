@@ -1,5 +1,5 @@
-#include "Log.hpp"
 #include "TimeManager.hpp"
+#include "Log.hpp"
 
 #include <cstdlib>
 #include <ctime>

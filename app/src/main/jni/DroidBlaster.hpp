@@ -2,13 +2,15 @@
 #define _PACKT_DROIDBLASTER_HPP_
 
 #include "ActivityHandler.hpp"
-#include "Asteroid.hpp"
-#include "EventLoop.hpp"
 #include "GraphicsManager.hpp"
 #include "PhysicsManager.hpp"
-#include "Ship.hpp"
 #include "TimeManager.hpp"
+#include "SpriteBatch.hpp"
+#include "EventLoop.hpp"
+#include "Resource.hpp"
+#include "Asteroid.hpp"
 #include "Types.hpp"
+#include "Ship.hpp"
 
 class DroidBlaster : public ActivityHandler {
 public:
@@ -56,9 +58,12 @@ private:
     GraphicsManager mGraphicsManager;
     PhysicsManager mPhysicsManager;
     EventLoop mEventLoop;
+    Resource mAsteroidTexture;
+    Resource mShipTexture;
 
     Asteroid mAsteroids;
     Ship mShip;
+    SpriteBatch mSpriteBatch;
 };
 
 #endif

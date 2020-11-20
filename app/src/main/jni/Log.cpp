@@ -1,7 +1,7 @@
 #include "Log.hpp"
 
-#include <stdarg.h>
 #include <android/log.h>
+#include <stdarg.h>
 
 void Log::info(const char* pMessage, ...) {
     va_list varArgs;
