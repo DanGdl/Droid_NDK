@@ -1,7 +1,8 @@
 #include "EventLoop.hpp"
 #include "Log.hpp"
 
-EventLoop::EventLoop(android_app *pApplication, ActivityHandler &pActivityHandler) :
+EventLoop::EventLoop(android_app *pApplication,
+                     ActivityHandler &pActivityHandler) :
         mApplication(pApplication),
         mActivityHandler(pActivityHandler),
         mEnabled(false), mQuit(false) {
@@ -68,7 +69,8 @@ void EventLoop::deactivate() {
     }
 }
 
-void EventLoop::callback_appEvent(android_app *pApplication, int32_t pCommand) {
+void EventLoop::callback_appEvent(android_app *pApplication,
+                                  int32_t pCommand) {
     EventLoop &eventLoop = *(EventLoop *) pApplication->userData;
     eventLoop.processAppEvent(pCommand);
 }
@@ -103,8 +105,8 @@ void EventLoop::processAppEvent(int32_t pCommand) {
             mActivityHandler.onResume();
             break;
         case APP_CMD_SAVE_STATE:
-            mActivityHandler.onSaveInstanceState(&mApplication->savedState,
-                                                 &mApplication->savedStateSize);
+            mActivityHandler.onSaveInstanceState(
+                    &mApplication->savedState, &mApplication->savedStateSize);
             break;
         case APP_CMD_START:
             mActivityHandler.onStart();

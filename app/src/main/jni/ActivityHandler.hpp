@@ -37,5 +37,4 @@ public:
 
     virtual void onLostFocus() {};
 };
-
 #endif

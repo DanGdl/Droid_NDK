@@ -2,19 +2,18 @@
 #include "SoundQueue.hpp"
 
 SoundQueue::SoundQueue() :
-        mPlayerObj(NULL), mPlayer(NULL),
+        mPlayerObj(NULL),
+        mPlayer(NULL),
         mPlayerQueue() {
 }
 
-status SoundQueue::initialize(SLEngineItf pEngine,
-                              SLObjectItf pOutputMixObj) {
+status SoundQueue::initialize(SLEngineItf pEngine, SLObjectItf pOutputMixObj) {
     Log::info("Starting sound player.");
     SLresult result;
 
     // Set-up sound audio source.
     SLDataLocator_AndroidSimpleBufferQueue dataLocatorIn;
-    dataLocatorIn.locatorType =
-            SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
+    dataLocatorIn.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
     // At most one buffer in the queue.
     dataLocatorIn.numBuffers = 1;
 
@@ -41,30 +40,34 @@ status SoundQueue::initialize(SLEngineItf pEngine,
 
     // Creates the sounds player and retrieves its interfaces.
     const SLuint32 soundPlayerIIDCount = 2;
-    const SLInterfaceID soundPlayerIIDs[] =
-            {SL_IID_PLAY, SL_IID_BUFFERQUEUE};
-    const SLboolean soundPlayerReqs[] =
-            {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
+    const SLInterfaceID soundPlayerIIDs[] = {SL_IID_PLAY, SL_IID_BUFFERQUEUE};
+    const SLboolean soundPlayerReqs[] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
-    result = (*pEngine)->CreateAudioPlayer(pEngine, &mPlayerObj,
-                                           &dataSource, &dataSink, soundPlayerIIDCount,
-                                           soundPlayerIIDs, soundPlayerReqs);
-    if (result != SL_RESULT_SUCCESS) goto ERROR;
+    result = (*pEngine)->CreateAudioPlayer(pEngine, &mPlayerObj, &dataSource, &dataSink,
+                                           soundPlayerIIDCount, soundPlayerIIDs, soundPlayerReqs);
+    if (result != SL_RESULT_SUCCESS) {
+        goto ERROR;
+    }
     result = (*mPlayerObj)->Realize(mPlayerObj, SL_BOOLEAN_FALSE);
-    if (result != SL_RESULT_SUCCESS) goto ERROR;
+    if (result != SL_RESULT_SUCCESS) {
+        goto ERROR;
+    }
 
-    result = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_PLAY,
-                                         &mPlayer);
-    if (result != SL_RESULT_SUCCESS) goto ERROR;
-    result = (*mPlayerObj)->GetInterface(mPlayerObj,
-                                         SL_IID_BUFFERQUEUE, &mPlayerQueue);
-    if (result != SL_RESULT_SUCCESS) goto ERROR;
+    result = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_PLAY, &mPlayer);
+    if (result != SL_RESULT_SUCCESS) {
+        goto ERROR;
+    }
+    result = (*mPlayerObj)->GetInterface(mPlayerObj, SL_IID_BUFFERQUEUE, &mPlayerQueue);
+    if (result != SL_RESULT_SUCCESS) {
+        goto ERROR;
+    }
 
     // Starts the sound player. Nothing can be heard while the
     // sound queue remains empty.
-    result = (*mPlayer)->SetPlayState(mPlayer,
-                                      SL_PLAYSTATE_PLAYING);
-    if (result != SL_RESULT_SUCCESS) goto ERROR;
+    result = (*mPlayer)->SetPlayState(mPlayer, SL_PLAYSTATE_PLAYING);
+    if (result != SL_RESULT_SUCCESS) {
+        goto ERROR;
+    }
     return STATUS_OK;
 
     ERROR:
@@ -94,11 +97,14 @@ void SoundQueue::playSound(Sound *pSound) {
 
         // Removes any sound from the queue.
         result = (*mPlayerQueue)->Clear(mPlayerQueue);
-        if (result != SL_RESULT_SUCCESS) goto ERROR;
+        if (result != SL_RESULT_SUCCESS) {
+            goto ERROR;
+        }
         // Plays the new sound.
-        result = (*mPlayerQueue)->Enqueue(mPlayerQueue, buffer,
-                                          length);
-        if (result != SL_RESULT_SUCCESS) goto ERROR;
+        result = (*mPlayerQueue)->Enqueue(mPlayerQueue, buffer, length);
+        if (result != SL_RESULT_SUCCESS) {
+            goto ERROR;
+        }
     }
     return;
 

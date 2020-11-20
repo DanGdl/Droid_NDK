@@ -1,8 +1,9 @@
 #ifndef _PACKT_EVENTLOOP_HPP_
 #define _PACKT_EVENTLOOP_HPP_
 
-#include <android_native_app_glue.h>
 #include "ActivityHandler.hpp"
+
+#include <android_native_app_glue.h>
 
 class EventLoop {
 public:
@@ -21,8 +22,9 @@ private:
 
 private:
     android_app *mApplication;
-    ActivityHandler &mActivityHandler;
     bool mEnabled;
     bool mQuit;
+
+    ActivityHandler &mActivityHandler;
 };
 #endif

@@ -1,7 +1,7 @@
 #include "Resource.hpp"
 
 #include <sys/stat.h>
-#include <cstring>
+#include <string>
 
 Resource::Resource(android_app *pApplication, const char *pPath) :
         mPath(pPath),
@@ -10,8 +10,9 @@ Resource::Resource(android_app *pApplication, const char *pPath) :
 }
 
 status Resource::open() {
-    mAsset = AAssetManager_open(mAssetManager, mPath, AASSET_MODE_UNKNOWN);
-    return (mAsset == NULL) ? STATUS_KO : STATUS_OK;
+    mAsset = AAssetManager_open(mAssetManager, mPath,
+                                AASSET_MODE_UNKNOWN);
+    return (mAsset != NULL) ? STATUS_OK : STATUS_KO;
 }
 
 void Resource::close() {
@@ -22,23 +23,24 @@ void Resource::close() {
 }
 
 status Resource::read(void *pBuffer, size_t pCount) {
-    const int32_t readCount = AAsset_read(mAsset, pBuffer, pCount);
+    int32_t readCount = AAsset_read(mAsset, pBuffer, pCount);
     return (readCount == pCount) ? STATUS_OK : STATUS_KO;
+}
+
+off_t Resource::getLength() {
+    return AAsset_getLength(mAsset);
 }
 
 ResourceDescriptor Resource::descriptor() {
     ResourceDescriptor lDescriptor = {-1, 0, 0};
-    AAsset *lAsset = AAssetManager_open(mAssetManager, mPath, AASSET_MODE_UNKNOWN);
+    AAsset *lAsset = AAssetManager_open(mAssetManager, mPath,
+                                        AASSET_MODE_UNKNOWN);
     if (lAsset != NULL) {
         lDescriptor.mDescriptor = AAsset_openFileDescriptor(lAsset, &lDescriptor.mStart,
                                                             &lDescriptor.mLength);
         AAsset_close(lAsset);
     }
     return lDescriptor;
-}
-
-off_t Resource::getLength() {
-    return AAsset_getLength(mAsset);
 }
 
 bool Resource::operator==(const Resource &pOther) {

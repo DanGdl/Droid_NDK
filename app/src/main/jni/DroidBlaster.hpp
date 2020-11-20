@@ -2,18 +2,17 @@
 #define _PACKT_DROIDBLASTER_HPP_
 
 #include "ActivityHandler.hpp"
+#include "Asteroid.hpp"
+#include "EventLoop.hpp"
 #include "GraphicsManager.hpp"
 #include "PhysicsManager.hpp"
+#include "Resource.hpp"
+#include "Ship.hpp"
 #include "SoundManager.hpp"
-#include "TimeManager.hpp"
 #include "SpriteBatch.hpp"
 #include "StarField.hpp"
-#include "EventLoop.hpp"
-#include "Resource.hpp"
-#include "Asteroid.hpp"
-#include "Sound.hpp"
+#include "TimeManager.hpp"
 #include "Types.hpp"
-#include "Ship.hpp"
 
 class DroidBlaster : public ActivityHandler {
 public:
@@ -23,19 +22,13 @@ public:
 
 protected:
     status onActivate();
-
     void onDeactivate();
-
     status onStep();
 
     void onStart();
-
     void onResume();
-
     void onPause();
-
     void onStop();
-
     void onDestroy();
 
     void onSaveInstanceState(void **pData, size_t *pSize);
@@ -62,17 +55,16 @@ private:
     PhysicsManager mPhysicsManager;
     SoundManager mSoundManager;
     EventLoop mEventLoop;
+
     Resource mAsteroidTexture;
     Resource mShipTexture;
     Resource mStarTexture;
-
-    Asteroid mAsteroids;
-    Ship mShip;
-    SpriteBatch mSpriteBatch;
-    StarField mStarField;
     Resource mBGM;
     Resource mCollisionSound;
 
+    Asteroid mAsteroids;
+    Ship mShip;
+    StarField mStarField;
+    SpriteBatch mSpriteBatch;
 };
-
 #endif

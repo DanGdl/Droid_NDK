@@ -27,5 +27,4 @@ private:
     float mElapsed;
     float mElapsedTotal;
 };
-
 #endif

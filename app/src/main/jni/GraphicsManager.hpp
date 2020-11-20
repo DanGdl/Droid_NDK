@@ -8,6 +8,12 @@
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
 
+class GraphicsComponent {
+public:
+    virtual status load() = 0;
+
+    virtual void draw() = 0;
+};
 
 struct TextureProperties {
     Resource *textureResource;
@@ -16,34 +22,23 @@ struct TextureProperties {
     int32_t height;
 };
 
-class GraphicsComponent {
-public:
-    virtual status load() = 0;
-
-    virtual void draw() = 0;
-};
-
 class GraphicsManager {
 public:
     GraphicsManager(android_app *pApplication);
 
     ~GraphicsManager();
 
-    int32_t getRenderWidth() {
-        return mRenderWidth;
-    }
+    int32_t getRenderWidth() { return mRenderWidth; }
 
-    int32_t getRenderHeight() {
-        return mRenderHeight;
-    }
+    int32_t getRenderHeight() { return mRenderHeight; }
 
     int32_t getScreenWidth() { return mScreenWidth; }
 
     int32_t getScreenHeight() { return mScreenHeight; }
 
-
     GLfloat *getProjectionMatrix() { return mProjectionMatrix[0]; }
 
+//    GraphicsElement* registerElement(int32_t pHeight, int32_t pWidth);
     void registerComponent(GraphicsComponent *pComponent);
 
     status start();
@@ -54,9 +49,11 @@ public:
 
     TextureProperties *loadTexture(Resource &pResource);
 
-    GLuint loadShader(const char *pVertexShader, const char *pFragmentShader);
+    GLuint loadShader(const char *pVertexShader,
+                      const char *pFragmentShader);
 
-    GLuint loadVertexBuffer(const void *pVertexBuffer, int32_t pVertexBufferSize);
+    GLuint loadVertexBuffer(const void *pVertexBuffer,
+                            int32_t pVertexBufferSize);
 
 private:
     const int PROJECTION_MATRIX_SIZE_COL = 4;
@@ -76,27 +73,26 @@ private:
 
     int32_t mRenderWidth;
     int32_t mRenderHeight;
-
     int32_t mScreenWidth;
     int32_t mScreenHeight;
-
     EGLDisplay mDisplay;
     EGLSurface mSurface;
     EGLContext mContext;
     GLfloat mProjectionMatrix[4][4];
 
+    // Graphics resources.
     TextureProperties mTextures[32];
     int32_t mTextureCount;
-
     GLuint mShaders[32];
     int32_t mShaderCount;
-
     GLuint mVertexBuffers[32];
     int32_t mVertexBufferCount;
 
+//    GraphicsElement* mElements[1024]; int32_t mElementCount;
     GraphicsComponent *mComponents[32];
     int32_t mComponentCount;
 
+    // Rendering resources.
     GLint mScreenFrameBuffer;
     GLuint mRenderFrameBuffer;
     GLuint mRenderVertexBuffer;
@@ -106,7 +102,5 @@ private:
     GLuint aTexture;
     GLuint uProjection;
     GLuint uTexture;
-
 };
-
 #endif

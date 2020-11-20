@@ -2,16 +2,15 @@
 #define _PACKT_SHIP_HPP_
 
 #include "GraphicsManager.hpp"
-#include "SoundManager.hpp"
 #include "Sprite.hpp"
+#include "SoundManager.hpp"
+#include "Sound.hpp"
 
 class Ship {
 public:
     Ship(android_app *pApplication, GraphicsManager &pGraphicsManager, SoundManager &pSoundManager);
 
     void registerShip(Sprite *pGraphics, Sound *pCollisionSound);
-
-    void registerShip(Sprite *pGraphics);
 
     void initialize();
 
@@ -22,10 +21,7 @@ private:
 
     GraphicsManager &mGraphicsManager;
     SoundManager &mSoundManager;
-
     Sprite *mGraphics;
     Sound *mCollisionSound;
-
 };
-
 #endif

@@ -26,5 +26,4 @@ private:
     SLPlayItf mPlayer;
     SLBufferQueueItf mPlayerQueue;
 };
-
 #endif

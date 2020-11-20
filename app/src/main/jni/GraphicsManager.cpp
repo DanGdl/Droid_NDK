@@ -1,13 +1,15 @@
 #include "GraphicsManager.hpp"
 #include "Log.hpp"
+
 #include <png.h>
 
 GraphicsManager::GraphicsManager(android_app *pApplication) :
         mApplication(pApplication),
         mRenderWidth(0), mRenderHeight(0),
-        mDisplay(EGL_NO_DISPLAY), mSurface(EGL_NO_CONTEXT), mContext(EGL_NO_SURFACE),
+        mScreenWidth(0), mScreenHeight(0),
+        mDisplay(EGL_NO_DISPLAY), mSurface(EGL_NO_CONTEXT),
+        mContext(EGL_NO_SURFACE),
         mProjectionMatrix(),
-
         mTextures(), mTextureCount(0),
         mShaders(), mShaderCount(0),
         mVertexBuffers(), mVertexBufferCount(0),
@@ -22,10 +24,6 @@ GraphicsManager::GraphicsManager(android_app *pApplication) :
 
 GraphicsManager::~GraphicsManager() {
     Log::info("Destroying GraphicsManager.");
-    for (int32_t i = 0; i < mShaderCount; ++i) {
-        glDeleteProgram(mShaders[i]);
-    }
-    mShaderCount = 0;
 }
 
 void GraphicsManager::registerComponent(GraphicsComponent *pComponent) {
@@ -34,15 +32,15 @@ void GraphicsManager::registerComponent(GraphicsComponent *pComponent) {
 
 status GraphicsManager::start() {
     Log::info("Starting GraphicsManager.");
-
-    EGLint format, numConfigs; // , errorResult;
-    // GLenum status;
+    EGLint format, numConfigs, errorResult;
+    GLenum status;
     EGLConfig config;
     // Defines display requirements. 16bits mode here.
     const EGLint DISPLAY_ATTRIBS[] = {
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
             EGL_BLUE_SIZE, 5, EGL_GREEN_SIZE, 6, EGL_RED_SIZE, 5,
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_NONE
+            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+            EGL_NONE
     };
     // Request an OpenGL ES 2 context.
     const EGLint CONTEXT_ATTRIBS[] = {
@@ -101,12 +99,12 @@ status GraphicsManager::start() {
     glViewport(0, 0, mRenderWidth, mRenderHeight);
     glDisable(GL_DEPTH_TEST);
 
+    // Prepares the projection matrix.
     for (int i = 0; i < PROJECTION_MATRIX_SIZE_COL; i++) {
         for (int j = 0; j < PROJECTION_MATRIX_SIZE_LINE; j++) {
             mProjectionMatrix[i][j] = 0;
         }
     }
-
     mProjectionMatrix[0][0] = 2.0f / GLfloat(mRenderWidth);
     mProjectionMatrix[1][1] = 2.0f / GLfloat(mRenderHeight);
     mProjectionMatrix[2][2] = -1.0f;
@@ -115,18 +113,20 @@ status GraphicsManager::start() {
     mProjectionMatrix[3][2] = 0.0f;
     mProjectionMatrix[3][3] = 1.0f;
 
-    for (int32_t i = 0; i < mComponentCount; ++i) {
-        if (mComponents[i]->load() != STATUS_OK) {
-            return STATUS_KO;
-        }
-    }
-
     // Displays information about OpenGL.
     Log::info("Starting GraphicsManager");
     Log::info("Version   : %s", glGetString(GL_VERSION));
     Log::info("Vendor    : %s", glGetString(GL_VENDOR));
     Log::info("Renderer  : %s", glGetString(GL_RENDERER));
+    Log::info("Viewport  : %d x %d", mScreenWidth, mScreenHeight);
     Log::info("Offscreen : %d x %d", mRenderWidth, mRenderHeight);
+
+    // Loads graphics components.
+    for (int32_t i = 0; i < mComponentCount; ++i) {
+        if (mComponents[i]->load() != STATUS_OK) {
+            return STATUS_KO;
+        }
+    }
     return STATUS_OK;
 
     ERROR:
@@ -221,6 +221,7 @@ void GraphicsManager::stop() {
     }
     mShaderCount = 0;
 
+    // Releases vertex buffers.
     for (int32_t i = 0; i < mVertexBufferCount; ++i) {
         glDeleteBuffers(1, &mVertexBuffers[i]);
     }
@@ -254,6 +255,7 @@ void GraphicsManager::stop() {
 }
 
 status GraphicsManager::update() {
+    // Uses the offscreen FBO for scene rendering.
     glBindFramebuffer(GL_FRAMEBUFFER, mRenderFrameBuffer);
     glViewport(0, 0, mRenderWidth, mRenderHeight);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -263,6 +265,7 @@ status GraphicsManager::update() {
         mComponents[i]->draw();
     }
 
+    // The FBO is rendered and scaled into the screen.
     glBindFramebuffer(GL_FRAMEBUFFER, mScreenFrameBuffer);
     glClear(GL_COLOR_BUFFER_BIT);
     glViewport(0, 0, mScreenWidth, mScreenHeight);
@@ -333,9 +336,7 @@ TextureProperties *GraphicsManager::loadTexture(Resource &pResource) {
     bool transparency;
 
     // Opens and checks image signature (first 8 bytes).
-    if (pResource.open() != STATUS_OK) {
-        goto ERROR;
-    }
+    if (pResource.open() != STATUS_OK) goto ERROR;
     Log::info("Checking signature.");
     if (pResource.read(header, sizeof(header)) != STATUS_OK) {
         goto ERROR;
@@ -406,7 +407,7 @@ TextureProperties *GraphicsManager::loadTexture(Resource &pResource) {
             format = GL_LUMINANCE_ALPHA;
             break;
     }
-    // Validates all transformations.
+    // Validates all tranformations.
     png_read_update_info(pngPtr, infoPtr);
 
     // Get row size in bytes.
@@ -414,7 +415,7 @@ TextureProperties *GraphicsManager::loadTexture(Resource &pResource) {
     if (rowSize <= 0) {
         goto ERROR;
     }
-    // Creates the image buffer that will be sent to OpenGL.
+    // Ceates the image buffer that will be sent to OpenGL.
     image = new png_byte[rowSize * height];
     if (!image) {
         goto ERROR;
@@ -437,7 +438,7 @@ TextureProperties *GraphicsManager::loadTexture(Resource &pResource) {
     delete[] rowPtrs;
 
     // Creates a new OpenGL texture.
-    // GLenum errorResult;
+    GLenum errorResult;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     // Set-up texture properties.
@@ -447,6 +448,8 @@ TextureProperties *GraphicsManager::loadTexture(Resource &pResource) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // Loads image data into OpenGL.
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
+    // Finished working with the texture.
+    glBindTexture(GL_TEXTURE_2D, 0);
     delete[] image;
     if (glGetError() != GL_NO_ERROR) {
         goto ERROR;
@@ -467,13 +470,14 @@ TextureProperties *GraphicsManager::loadTexture(Resource &pResource) {
     delete[] rowPtrs;
     delete[] image;
     if (pngPtr != NULL) {
-        png_infop *infoPtrP = infoPtr == NULL ? NULL : &infoPtr;
+        png_infop *infoPtrP = infoPtr != NULL ? &infoPtr : NULL;
         png_destroy_read_struct(&pngPtr, infoPtrP, NULL);
     }
     return NULL;
 }
 
-GLuint GraphicsManager::loadShader(const char *pVertexShader, const char *pFragmentShader) {
+GLuint GraphicsManager::loadShader(const char *pVertexShader,
+                                   const char *pFragmentShader) {
     GLint result;
     char log[256];
     GLuint vertexShader, fragmentShader, shaderProgram;
@@ -525,25 +529,99 @@ GLuint GraphicsManager::loadShader(const char *pVertexShader, const char *pFragm
     return 0;
 }
 
-GLuint GraphicsManager::loadVertexBuffer(const void *pVertexBuffer, int32_t pVertexBufferSize) {
+GLuint GraphicsManager::loadVertexBuffer(const void *pVertexBuffer,
+                                         int32_t pVertexBufferSize) {
     GLuint vertexBuffer;
     // Upload specified memory buffer into OpenGL.
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, pVertexBufferSize, pVertexBuffer, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, pVertexBufferSize, pVertexBuffer,
+                 GL_STATIC_DRAW);
     // Unbinds the buffer.
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    if (glGetError() != GL_NO_ERROR) {
-        goto ERROR;
-    }
+    if (glGetError() != GL_NO_ERROR) goto ERROR;
 
     mVertexBuffers[mVertexBufferCount++] = vertexBuffer;
     return vertexBuffer;
 
     ERROR:
     Log::error("Error loading vertex buffer.");
-    if (vertexBuffer > 0) {
-        glDeleteBuffers(1, &vertexBuffer);
-    }
+    if (vertexBuffer > 0) glDeleteBuffers(1, &vertexBuffer);
     return 0;
 }
+
+//status GraphicsManager::start() {
+//    Log::info("Starting GraphicsManager.");
+//
+//    // Forces 32 bits format.
+//    ANativeWindow_Buffer windowBuffer;
+//    if (ANativeWindow_setBuffersGeometry(mApplication->window, 0, 0,
+//        WINDOW_FORMAT_RGBX_8888) < 0) {
+//        Log::error("Error while setting buffer geometry.");
+//        return STATUS_KO;
+//    }
+//
+//    // Needs to lock the window buffer to get its properties.
+//    if (ANativeWindow_lock(mApplication->window,
+//            &windowBuffer, NULL) >= 0) {
+//        mRenderWidth = windowBuffer.width;
+//        mRenderHeight = windowBuffer.height;
+//        ANativeWindow_unlockAndPost(mApplication->window);
+//    } else {
+//        Log::error("Error while locking window.");
+//        return STATUS_KO;
+//    }
+//    return STATUS_OK;
+//}
+//
+//status GraphicsManager::update() {
+//    // Locks the window buffer and draws on it.
+//    ANativeWindow_Buffer windowBuffer;
+//    if (ANativeWindow_lock(mApplication->window,
+//            &windowBuffer, NULL) < 0) {
+//        Log::error("Error while starting GraphicsManager");
+//        return STATUS_KO;
+//    }
+//
+//    // Clears the window.
+//    memset(windowBuffer.bits, 0, windowBuffer.stride *
+//            windowBuffer.height * sizeof(uint32_t*));
+//
+//    // Renders graphic elements.
+//    int32_t maxX = windowBuffer.width - 1;
+//    int32_t maxY = windowBuffer.height - 1;
+//    for (int32_t i = 0; i < mElementCount; ++i) {
+//        GraphicsElement* element = mElements[i];
+//
+//        // Computes coordinates.
+//        int32_t leftX = element->location.x - element->width / 2;
+//        int32_t rightX = element->location.x + element->width / 2;
+//        int32_t leftY = windowBuffer.height - element->location.y
+//                            - element->height / 2;
+//        int32_t rightY = windowBuffer.height - element->location.y
+//                            + element->height / 2;
+//
+//        // Clips coordinates.
+//        if (rightX < 0 || leftX > maxX
+//         || rightY < 0 || leftY > maxY) continue;
+//
+//        if (leftX < 0) leftX = 0;
+//        else if (rightX > maxX) rightX = maxX;
+//        if (leftY < 0) leftY = 0;
+//        else if (rightY > maxY) rightY = maxY;
+//
+//        // Draws a rectangle.
+//        uint32_t* line = (uint32_t*) (windowBuffer.bits)
+//                        + (windowBuffer.stride * leftY);
+//        for (int iY = leftY; iY <= rightY; iY++) {
+//            for (int iX = leftX; iX <= rightX; iX++) {
+//                line[iX] = 0X000000FF; // Red color
+//            }
+//            line = line + windowBuffer.stride;
+//        }
+//    }
+//
+//    // Finshed drawing.
+//    ANativeWindow_unlockAndPost(mApplication->window);
+//    return STATUS_OK;
+//}

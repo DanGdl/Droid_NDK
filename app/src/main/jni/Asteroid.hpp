@@ -9,7 +9,8 @@
 class Asteroid {
 public:
     Asteroid(android_app *pApplication, TimeManager &pTimeManager,
-             GraphicsManager &pGraphicsManager, PhysicsManager &pPhysicsManager);
+             GraphicsManager &pGraphicsManager,
+             PhysicsManager &pPhysicsManager);
 
     void registerAsteroid(Location &pLocation, int32_t pSizeX, int32_t pSizeY);
 
@@ -36,5 +37,4 @@ private:
     float mLeftBound;
     float mRightBound;
 };
-
 #endif

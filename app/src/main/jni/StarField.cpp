@@ -59,7 +59,8 @@ status StarField::load() {
     }
 
     // Loads the texture.
-    textureProperties = mGraphicsManager.loadTexture(mTextureResource);
+    textureProperties =
+            mGraphicsManager.loadTexture(mTextureResource);
     if (textureProperties == NULL) {
         goto ERROR;
     }
@@ -103,7 +104,8 @@ void StarField::draw() {
 
     // Selects the shader and passes parameters.
     glUseProgram(mShaderProgram);
-    glUniformMatrix4fv(uProjection, 1, GL_FALSE, mGraphicsManager.getProjectionMatrix());
+    glUniformMatrix4fv(uProjection, 1, GL_FALSE,
+                       mGraphicsManager.getProjectionMatrix());
     glUniform1f(uHeight, mGraphicsManager.getRenderHeight());
     glUniform1f(uTime, mTimeManager.elapsedTotal());
     glUniform1i(uTexture, 0);

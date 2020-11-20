@@ -1,7 +1,8 @@
 #include "SpriteBatch.hpp"
 #include "Log.hpp"
 
-SpriteBatch::SpriteBatch(TimeManager &pTimeManager, GraphicsManager &pGraphicsManager) :
+SpriteBatch::SpriteBatch(TimeManager &pTimeManager,
+                         GraphicsManager &pGraphicsManager) :
         mTimeManager(pTimeManager),
         mGraphicsManager(pGraphicsManager),
         mSprites(), mSpriteCount(0),
@@ -111,8 +112,7 @@ void SpriteBatch::draw() {
     const int32_t indexPerSprite = 6;
     float timeStep = mTimeManager.elapsed();
     int32_t spriteCount = mSpriteCount;
-    int32_t currentSprite = 0;
-    int32_t firstSprite = 0;
+    int32_t currentSprite = 0, firstSprite = 0;
     while (bool canDraw = (currentSprite < spriteCount)) {
         // Switches texture.
         Sprite *sprite = mSprites[currentSprite];
@@ -124,8 +124,7 @@ void SpriteBatch::draw() {
         do {
             sprite = mSprites[currentSprite];
             if (sprite->mTexture == currentTexture) {
-                Sprite::Vertex *vertices =
-                        (&mVertices[currentSprite * 4]);
+                Sprite::Vertex *vertices = (&mVertices[currentSprite * 4]);
                 sprite->draw(vertices, timeStep);
             } else {
                 break;

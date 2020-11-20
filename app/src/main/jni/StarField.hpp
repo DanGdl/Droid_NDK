@@ -10,8 +10,8 @@
 class StarField : public GraphicsComponent {
 public:
     StarField(android_app *pApplication, TimeManager &pTimeManager,
-              GraphicsManager &pGraphicsManager, int32_t pStarCount,
-              Resource &pTextureResource);
+              GraphicsManager &pGraphicsManager,
+              int32_t pStarCount, Resource &pTextureResource);
 
     status load();
 
@@ -41,5 +41,4 @@ private:
     GLuint uHeight;
     GLuint uTexture;
 };
-
 #endif

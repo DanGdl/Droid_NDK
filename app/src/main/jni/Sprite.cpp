@@ -1,8 +1,9 @@
 #include "Sprite.hpp"
 #include "Log.hpp"
 
-Sprite::Sprite(GraphicsManager &pGraphicsManager, Resource &pTextureResource, int32_t pHeight,
-               int32_t pWidth) :
+Sprite::Sprite(GraphicsManager &pGraphicsManager,
+               Resource &pTextureResource,
+               int32_t pHeight, int32_t pWidth) :
         location(),
         mTextureResource(pTextureResource), mTexture(0),
         mSheetWidth(0), mSheetHeight(0),
@@ -26,7 +27,8 @@ status Sprite::load(GraphicsManager &pGraphicsManager) {
     return STATUS_OK;
 }
 
-void Sprite::setAnimation(int32_t pStartFrame, int32_t pFrameCount, float pSpeed, bool pLoop) {
+void Sprite::setAnimation(int32_t pStartFrame,
+                          int32_t pFrameCount, float pSpeed, bool pLoop) {
     mAnimStartFrame = pStartFrame;
     mAnimFrame = 0.0f, mAnimSpeed = pSpeed, mAnimLoop = pLoop;
     mAnimFrameCount = pFrameCount;
@@ -64,25 +66,18 @@ void Sprite::draw(Vertex pVertices[4], float pTimeStep) {
 
     pVertices[0].x = posX1;
     pVertices[0].y = posY1;
-
     pVertices[0].u = u1;
     pVertices[0].v = v1;
-
     pVertices[1].x = posX1;
     pVertices[1].y = posY2;
-
     pVertices[1].u = u1;
     pVertices[1].v = v2;
-
     pVertices[2].x = posX2;
     pVertices[2].y = posY1;
-
     pVertices[2].u = u2;
     pVertices[2].v = v1;
-
     pVertices[3].x = posX2;
     pVertices[3].y = posY2;
-
     pVertices[3].u = u2;
     pVertices[3].v = v2;
 }

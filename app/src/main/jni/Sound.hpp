@@ -31,5 +31,4 @@ private:
     uint8_t *mBuffer;
     off_t mLength;
 };
-
 #endif

@@ -7,7 +7,9 @@
 
 struct PhysicsBody {
     PhysicsBody(Location *pLocation, int32_t pWidth, int32_t pHeight) :
-            location(pLocation), width(pWidth), height(pHeight), velocityX(0.0f), velocityY(0.0f) {
+            location(pLocation),
+            width(pWidth), height(pHeight),
+            velocityX(0.0f), velocityY(0.0f) {
     }
 
     Location *location;
@@ -38,5 +40,4 @@ private:
     PhysicsBody *mPhysicsBodies[1024];
     int32_t mPhysicsBodyCount;
 };
-
 #endif

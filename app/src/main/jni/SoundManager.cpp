@@ -1,6 +1,6 @@
 #include "Log.hpp"
+#include "Resource.hpp"
 #include "SoundManager.hpp"
-
 #include <string>
 
 SoundManager::SoundManager(android_app *pApplication) :
@@ -8,7 +8,8 @@ SoundManager::SoundManager(android_app *pApplication) :
         mEngineObj(NULL), mEngine(NULL),
         mOutputMixObj(NULL),
         mBGMPlayerObj(NULL), mBGMPlayer(NULL), mBGMPlayerSeek(NULL),
-        mSoundQueues(), mCurrentQueue(0), mSounds(), mSoundCount(0) {
+        mSoundQueues(), mCurrentQueue(0),
+        mSounds(), mSoundCount(0) {
     Log::info("Creating SoundManager.");
 }
 
@@ -48,12 +49,6 @@ status SoundManager::start() {
     result = (*mEngine)->CreateOutputMix(mEngine, &mOutputMixObj, outputMixIIDCount, outputMixIIDs,
                                          outputMixReqs);
     result = (*mOutputMixObj)->Realize(mOutputMixObj, SL_BOOLEAN_FALSE);
-
-//    result = (*mPlayerQueue)->RegisterCallback(mPlayerQueue, callback_sound, this);
-//    if (result != SL_RESULT_SUCCESS) goto ERROR;
-//    result = (*mPlayer)->SetCallbackEventsMask(mPlayer, SL_PLAYEVENT_HEADATEND);
-//    if (result != SL_RESULT_SUCCESS) goto ERROR;
-
 
     // Set-up sound player.
     Log::info("Starting sound player.");
@@ -105,13 +100,12 @@ void SoundManager::stop() {
     }
 }
 
-status SoundManager::playBGM(const char *pPath) {
+status SoundManager::playBGM(Resource &pResource) {
     SLresult result;
-    Log::info("Opening BGM %s", pPath);
+    Log::info("Opening BGM %s", pResource.getPath());
 
     // Set-up BGM audio source.
-    Resource resource(mApplication, pPath);
-    ResourceDescriptor descriptor = resource.descriptor();
+    ResourceDescriptor descriptor = pResource.descriptor();
     if (descriptor.mDescriptor < 0) {
         Log::info("Could not open BGM file");
         return STATUS_KO;
@@ -145,7 +139,8 @@ status SoundManager::playBGM(const char *pPath) {
     const SLInterfaceID bgmPlayerIIDs[] = {SL_IID_PLAY, SL_IID_SEEK};
     const SLboolean bgmPlayerReqs[] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
-    result = (*mEngine)->CreateAudioPlayer(mEngine, &mBGMPlayerObj, &dataSource, &dataSink,
+    result = (*mEngine)->CreateAudioPlayer(mEngine,
+                                           &mBGMPlayerObj, &dataSource, &dataSink,
                                            bgmPlayerIIDCount, bgmPlayerIIDs, bgmPlayerReqs);
     if (result != SL_RESULT_SUCCESS) {
         goto ERROR;

@@ -1,4 +1,3 @@
-#LOCAL_ARM_NEON := true
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)

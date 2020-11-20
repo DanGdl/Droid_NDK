@@ -40,5 +40,4 @@ private:
     GLuint uProjection;
     GLuint uTexture;
 };
-
 #endif

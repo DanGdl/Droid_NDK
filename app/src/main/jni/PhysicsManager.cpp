@@ -1,7 +1,8 @@
 #include "PhysicsManager.hpp"
 #include "Log.hpp"
 
-PhysicsManager::PhysicsManager(TimeManager &pTimeManager, GraphicsManager &pGraphicsManager) :
+PhysicsManager::PhysicsManager(TimeManager &pTimeManager,
+                               GraphicsManager &pGraphicsManager) :
         mTimeManager(pTimeManager), mGraphicsManager(pGraphicsManager),
         mPhysicsBodies(), mPhysicsBodyCount(0) {
     Log::info("Creating PhysicsManager.");
@@ -14,7 +15,8 @@ PhysicsManager::~PhysicsManager() {
     }
 }
 
-PhysicsBody *PhysicsManager::loadBody(Location &pLocation, int32_t pSizeX, int32_t pSizeY) {
+PhysicsBody *PhysicsManager::loadBody(Location &pLocation,
+                                      int32_t pSizeX, int32_t pSizeY) {
     PhysicsBody *body = new PhysicsBody(&pLocation, pSizeX, pSizeY);
     mPhysicsBodies[mPhysicsBodyCount++] = body;
     return body;

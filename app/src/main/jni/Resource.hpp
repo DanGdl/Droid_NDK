@@ -1,9 +1,9 @@
 #ifndef _PACKT_RESOURCE_HPP_
 #define _PACKT_RESOURCE_HPP_
 
-#include <android_native_app_glue.h>
-
 #include "Types.hpp"
+
+#include <android_native_app_glue.h>
 
 struct ResourceDescriptor {
     int32_t mDescriptor;

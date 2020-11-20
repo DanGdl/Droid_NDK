@@ -1,6 +1,6 @@
 #include "DroidBlaster.hpp"
+#include "Sound.hpp"
 #include "Log.hpp"
-#include "SpriteBatch.hpp"
 
 #include <unistd.h>
 
@@ -15,8 +15,8 @@ static const int32_t ASTEROID_FRAME_1 = 0;
 static const int32_t ASTEROID_FRAME_COUNT = 16;
 static const float ASTEROID_MIN_ANIM_SPEED = 8.0f;
 static const float ASTEROID_ANIM_SPEED_RANGE = 16.0f;
-static const int32_t STAR_COUNT = 50;
 
+static const int32_t STAR_COUNT = 50;
 
 DroidBlaster::DroidBlaster(android_app *pApplication) :
         mTimeManager(),
@@ -31,15 +31,17 @@ DroidBlaster::DroidBlaster(android_app *pApplication) :
         mBGM(pApplication, "bgm.mp3"),
         mCollisionSound(pApplication, "collision.pcm"),
 
-        mAsteroids(pApplication, mTimeManager, mGraphicsManager, mPhysicsManager),
+        mAsteroids(pApplication, mTimeManager, mGraphicsManager,
+                   mPhysicsManager),
         mShip(pApplication, mGraphicsManager, mSoundManager),
-        mStarField(pApplication, mTimeManager, mGraphicsManager, STAR_COUNT, mStarTexture),
+        mStarField(pApplication, mTimeManager, mGraphicsManager,
+                   STAR_COUNT, mStarTexture),
         mSpriteBatch(mTimeManager, mGraphicsManager) {
     Log::info("Creating DroidBlaster");
 
     Sprite *shipGraphics = mSpriteBatch.registerSprite(mShipTexture, SHIP_SIZE, SHIP_SIZE);
     shipGraphics->setAnimation(SHIP_FRAME_1, SHIP_FRAME_COUNT, SHIP_ANIM_SPEED, true);
-    mShip.registerShip(shipGraphics);
+
     Sound *collisionSound = mSoundManager.registerSound(mCollisionSound);
     mShip.registerShip(shipGraphics, collisionSound);
 
@@ -59,16 +61,16 @@ void DroidBlaster::run() {
 
 status DroidBlaster::onActivate() {
     Log::info("Activating DroidBlaster");
-
     // Starts managers.
     if (mGraphicsManager.start() != STATUS_OK) {
         return STATUS_KO;
     }
-
     if (mSoundManager.start() != STATUS_OK) {
         return STATUS_KO;
     }
-    mSoundManager.playBGM("droidblaster/bgm.mp3");
+
+    // Plays music and a sound at startup.
+    mSoundManager.playBGM(mBGM);
 
     // Initializes game objects.
     mAsteroids.initialize();

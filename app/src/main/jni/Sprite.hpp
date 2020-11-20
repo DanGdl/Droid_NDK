@@ -6,7 +6,6 @@
 #include "Types.hpp"
 
 #include <GLES2/gl2.h>
-#include <EGL/egl.h>
 
 class SpriteBatch;
 
@@ -48,5 +47,4 @@ private:
     float mAnimSpeed, mAnimFrame;
     bool mAnimLoop;
 };
-
 #endif
