@@ -6,6 +6,7 @@
 #include "PhysicsManager.hpp"
 #include "TimeManager.hpp"
 #include "SpriteBatch.hpp"
+#include "StarField.hpp"
 #include "EventLoop.hpp"
 #include "Resource.hpp"
 #include "Asteroid.hpp"
@@ -60,10 +61,13 @@ private:
     EventLoop mEventLoop;
     Resource mAsteroidTexture;
     Resource mShipTexture;
+    Resource mStarTexture;
 
     Asteroid mAsteroids;
     Ship mShip;
     SpriteBatch mSpriteBatch;
+    StarField mStarField;
+
 };
 
 #endif

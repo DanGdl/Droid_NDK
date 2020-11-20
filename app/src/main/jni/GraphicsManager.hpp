@@ -51,6 +51,8 @@ public:
 
     GLuint loadShader(const char *pVertexShader, const char *pFragmentShader);
 
+    GLuint loadVertexBuffer(const void *pVertexBuffer, int32_t pVertexBufferSize);
+
 private:
     const int PROJECTION_MATRIX_SIZE_COL = 4;
     const int PROJECTION_MATRIX_SIZE_LINE = 4;
@@ -75,8 +77,13 @@ private:
 
     TextureProperties mTextures[32];
     int32_t mTextureCount;
+
     GLuint mShaders[32];
     int32_t mShaderCount;
+
+    GLuint mVertexBuffers[32];
+    int32_t mVertexBufferCount;
+
     GraphicsComponent *mComponents[32];
     int32_t mComponentCount;
 };
