@@ -37,6 +37,11 @@ public:
         return mRenderHeight;
     }
 
+    int32_t getScreenWidth() { return mScreenWidth; }
+
+    int32_t getScreenHeight() { return mScreenHeight; }
+
+
     GLfloat *getProjectionMatrix() { return mProjectionMatrix[0]; }
 
     void registerComponent(GraphicsComponent *pComponent);
@@ -61,6 +66,8 @@ private:
 
     void operator=(const GraphicsManager &);
 
+    status initializeRenderBuffer();
+
     struct RenderVertex {
         GLfloat x, y, u, v;
     };
@@ -69,6 +76,9 @@ private:
 
     int32_t mRenderWidth;
     int32_t mRenderHeight;
+
+    int32_t mScreenWidth;
+    int32_t mScreenHeight;
 
     EGLDisplay mDisplay;
     EGLSurface mSurface;
@@ -86,6 +96,17 @@ private:
 
     GraphicsComponent *mComponents[32];
     int32_t mComponentCount;
+
+    GLint mScreenFrameBuffer;
+    GLuint mRenderFrameBuffer;
+    GLuint mRenderVertexBuffer;
+    GLuint mRenderTexture;
+    GLuint mRenderShaderProgram;
+    GLuint aPosition;
+    GLuint aTexture;
+    GLuint uProjection;
+    GLuint uTexture;
+
 };
 
 #endif
