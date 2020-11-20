@@ -1,1 +1,2 @@
-APP_ABI := armeabi armeabi-v7a x86
+APP_ABI := all
+LOCAL_ARM_NEON := true

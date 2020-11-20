@@ -7,3 +7,6 @@
 /.project
 /import-summary.txt
 /local.properties
+/app/build/
+/build/android-profile/
+/app/.cxx/

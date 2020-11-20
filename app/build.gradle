@@ -2,16 +2,22 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion '30.0.2'
+    ndkVersion '21.3.6528147'
 
     defaultConfig {
-        applicationId "com.packtpub.droidblaster2d"
-        minSdkVersion 19
+        applicationId "com.mdgd.blaster"
+        minSdkVersion 9
         targetSdkVersion 30
 
-        ndk {
-            moduleName "droidblaster"
-        }
+//        ndk {
+//            abiFilters "x86_64", "x86", "armeabi-v7a", "arm64-v8a"
+//        }
+//        externalNativeBuild {
+//            cmake {
+//                cppFlags "-DANDROID_STL=c++_static"
+//            }
+//        }
     }
 
     buildTypes {
@@ -19,5 +25,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni/Android.mk'
+        }
+        // cmake {
+        //     path "src/main/jni/CMakeLists.txt"
+        //     version "3.10.2"
+        // }
     }
 }
