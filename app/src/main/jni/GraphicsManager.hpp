@@ -8,6 +8,7 @@
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
 
+
 struct TextureProperties {
     Resource *textureResource;
     GLuint texture;
@@ -51,6 +52,9 @@ public:
     GLuint loadShader(const char *pVertexShader, const char *pFragmentShader);
 
 private:
+    const int PROJECTION_MATRIX_SIZE_COL = 4;
+    const int PROJECTION_MATRIX_SIZE_LINE = 4;
+
     GraphicsManager(const GraphicsManager &);
 
     void operator=(const GraphicsManager &);

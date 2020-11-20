@@ -1,8 +1,8 @@
 #include "Sprite.hpp"
 #include "Log.hpp"
 
-Sprite::Sprite(GraphicsManager &pGraphicsManager,
-               Resource &pTextureResource, int32_t pHeight, int32_t pWidth) :
+Sprite::Sprite(GraphicsManager &pGraphicsManager, Resource &pTextureResource, int32_t pHeight,
+               int32_t pWidth) :
         location(),
         mTextureResource(pTextureResource), mTexture(0),
         mSheetWidth(0), mSheetHeight(0),
@@ -26,8 +26,7 @@ status Sprite::load(GraphicsManager &pGraphicsManager) {
     return STATUS_OK;
 }
 
-void Sprite::setAnimation(int32_t pStartFrame,
-                          int32_t pFrameCount, float pSpeed, bool pLoop) {
+void Sprite::setAnimation(int32_t pStartFrame, int32_t pFrameCount, float pSpeed, bool pLoop) {
     mAnimStartFrame = pStartFrame;
     mAnimFrame = 0.0f, mAnimSpeed = pSpeed, mAnimLoop = pLoop;
     mAnimFrameCount = pFrameCount;

@@ -1,8 +1,7 @@
 #include "SpriteBatch.hpp"
 #include "Log.hpp"
 
-SpriteBatch::SpriteBatch(TimeManager &pTimeManager,
-                         GraphicsManager &pGraphicsManager) :
+SpriteBatch::SpriteBatch(TimeManager &pTimeManager, GraphicsManager &pGraphicsManager) :
         mTimeManager(pTimeManager),
         mGraphicsManager(pGraphicsManager),
         mSprites(), mSpriteCount(0),
@@ -61,7 +60,9 @@ status SpriteBatch::load() {
 
     // Creates and retrieves shader attributes and uniforms.
     mShaderProgram = mGraphicsManager.loadShader(VERTEX_SHADER, FRAGMENT_SHADER);
-    if (mShaderProgram == 0) return STATUS_KO;
+    if (mShaderProgram == 0) {
+        return STATUS_KO;
+    }
     aPosition = glGetAttribLocation(mShaderProgram, "aPosition");
     aTexture = glGetAttribLocation(mShaderProgram, "aTexture");
     uProjection = glGetUniformLocation(mShaderProgram, "uProjection");

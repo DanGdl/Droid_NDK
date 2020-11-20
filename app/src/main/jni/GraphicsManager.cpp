@@ -42,7 +42,6 @@ status GraphicsManager::start() {
     const EGLint CONTEXT_ATTRIBS[] = {
             EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE
     };
-    const int matrix_size = sizeof(mProjectionMatrix);
 
     // Retrieves a display connection and initializes it.
     Log::info("Connecting to the display.");
@@ -91,13 +90,12 @@ status GraphicsManager::start() {
     glViewport(0, 0, mRenderWidth, mRenderHeight);
     glDisable(GL_DEPTH_TEST);
 
-    for (int i = 0; i < matrix_size; i++) {
-        const int arr_size = sizeof(mProjectionMatrix[i]);
-        for (int j = 0; j < arr_size; j++) {
+    for (int i = 0; i < PROJECTION_MATRIX_SIZE_COL; i++) {
+        for (int j = 0; j < PROJECTION_MATRIX_SIZE_LINE; j++) {
             mProjectionMatrix[i][j] = 0;
         }
     }
-    // memset(mProjectionMatrix[0], 0, sizeof(mProjectionMatrix));
+
     mProjectionMatrix[0][0] = 2.0f / GLfloat(mRenderWidth);
     mProjectionMatrix[1][1] = 2.0f / GLfloat(mRenderHeight);
     mProjectionMatrix[2][2] = -1.0f;
@@ -142,8 +140,7 @@ void GraphicsManager::stop() {
 
     // Destroys OpenGL context.
     if (mDisplay != EGL_NO_DISPLAY) {
-        eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                       EGL_NO_CONTEXT);
+        eglMakeCurrent(mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (mContext != EGL_NO_CONTEXT) {
             eglDestroyContext(mDisplay, mContext);
             mContext = EGL_NO_CONTEXT;

@@ -16,11 +16,10 @@ public:
         GLfloat x, y, u, v;
     };
 
-    Sprite(GraphicsManager &pGraphicsManager,
-           Resource &pTextureResource, int32_t pHeight, int32_t pWidth);
+    Sprite(GraphicsManager &pGraphicsManager, Resource &pTextureResource, int32_t pHeight,
+           int32_t pWidth);
 
-    void setAnimation(int32_t pStartFrame, int32_t pFrameCount,
-                      float pSpeed, bool pLoop);
+    void setAnimation(int32_t pStartFrame, int32_t pFrameCount, float pSpeed, bool pLoop);
 
     bool animationEnded() { return mAnimFrame > (mAnimFrameCount - 1); }
 
