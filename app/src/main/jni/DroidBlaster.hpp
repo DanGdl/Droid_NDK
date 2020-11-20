@@ -4,12 +4,14 @@
 #include "ActivityHandler.hpp"
 #include "GraphicsManager.hpp"
 #include "PhysicsManager.hpp"
+#include "SoundManager.hpp"
 #include "TimeManager.hpp"
 #include "SpriteBatch.hpp"
 #include "StarField.hpp"
 #include "EventLoop.hpp"
 #include "Resource.hpp"
 #include "Asteroid.hpp"
+#include "Sound.hpp"
 #include "Types.hpp"
 #include "Ship.hpp"
 
@@ -58,6 +60,7 @@ private:
     TimeManager mTimeManager;
     GraphicsManager mGraphicsManager;
     PhysicsManager mPhysicsManager;
+    SoundManager mSoundManager;
     EventLoop mEventLoop;
     Resource mAsteroidTexture;
     Resource mShipTexture;
@@ -67,6 +70,8 @@ private:
     Ship mShip;
     SpriteBatch mSpriteBatch;
     StarField mStarField;
+    Resource mBGM;
+    Resource mCollisionSound;
 
 };
 

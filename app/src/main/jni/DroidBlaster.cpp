@@ -22,14 +22,17 @@ DroidBlaster::DroidBlaster(android_app *pApplication) :
         mTimeManager(),
         mGraphicsManager(pApplication),
         mPhysicsManager(mTimeManager, mGraphicsManager),
+        mSoundManager(pApplication),
         mEventLoop(pApplication, *this),
 
         mAsteroidTexture(pApplication, "asteroid.png"),
         mShipTexture(pApplication, "ship.png"),
         mStarTexture(pApplication, "star.png"),
+        mBGM(pApplication, "bgm.mp3"),
+        mCollisionSound(pApplication, "collision.pcm"),
 
         mAsteroids(pApplication, mTimeManager, mGraphicsManager, mPhysicsManager),
-        mShip(pApplication, mGraphicsManager),
+        mShip(pApplication, mGraphicsManager, mSoundManager),
         mStarField(pApplication, mTimeManager, mGraphicsManager, STAR_COUNT, mStarTexture),
         mSpriteBatch(mTimeManager, mGraphicsManager) {
     Log::info("Creating DroidBlaster");
@@ -37,6 +40,8 @@ DroidBlaster::DroidBlaster(android_app *pApplication) :
     Sprite *shipGraphics = mSpriteBatch.registerSprite(mShipTexture, SHIP_SIZE, SHIP_SIZE);
     shipGraphics->setAnimation(SHIP_FRAME_1, SHIP_FRAME_COUNT, SHIP_ANIM_SPEED, true);
     mShip.registerShip(shipGraphics);
+    Sound *collisionSound = mSoundManager.registerSound(mCollisionSound);
+    mShip.registerShip(shipGraphics, collisionSound);
 
     // Creates asteroids.
     for (int32_t i = 0; i < ASTEROID_COUNT; ++i) {
@@ -60,6 +65,11 @@ status DroidBlaster::onActivate() {
         return STATUS_KO;
     }
 
+    if (mSoundManager.start() != STATUS_OK) {
+        return STATUS_KO;
+    }
+    mSoundManager.playBGM("droidblaster/bgm.mp3");
+
     // Initializes game objects.
     mAsteroids.initialize();
     mShip.initialize();
@@ -71,6 +81,7 @@ status DroidBlaster::onActivate() {
 void DroidBlaster::onDeactivate() {
     Log::info("Deactivating DroidBlaster");
     mGraphicsManager.stop();
+    mSoundManager.stop();
 }
 
 status DroidBlaster::onStep() {
