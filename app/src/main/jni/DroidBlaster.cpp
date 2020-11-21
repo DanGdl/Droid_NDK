@@ -44,6 +44,7 @@ DroidBlaster::DroidBlaster(android_app *pApplication) :
 
     Sound *collisionSound = mSoundManager.registerSound(mCollisionSound);
     mShip.registerShip(shipGraphics, collisionSound);
+    mMoveableBody.registerMoveableBody(shipGraphics->location, SHIP_SIZE, SHIP_SIZE);
 
     // Creates asteroids.
     for (int32_t i = 0; i < ASTEROID_COUNT; ++i) {
