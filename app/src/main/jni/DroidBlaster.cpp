@@ -23,7 +23,8 @@ DroidBlaster::DroidBlaster(android_app *pApplication) :
         mGraphicsManager(pApplication),
         mPhysicsManager(mTimeManager, mGraphicsManager),
         mSoundManager(pApplication),
-        mEventLoop(pApplication, *this),
+        mInputManager(pApplication, mGraphicsManager),
+        mEventLoop(pApplication, *this, mInputManager),
 
         mAsteroidTexture(pApplication, "asteroid.png"),
         mShipTexture(pApplication, "ship.png"),
@@ -31,12 +32,11 @@ DroidBlaster::DroidBlaster(android_app *pApplication) :
         mBGM(pApplication, "bgm.mp3"),
         mCollisionSound(pApplication, "collision.pcm"),
 
-        mAsteroids(pApplication, mTimeManager, mGraphicsManager,
-                   mPhysicsManager),
+        mAsteroids(pApplication, mTimeManager, mGraphicsManager, mPhysicsManager),
         mShip(pApplication, mGraphicsManager, mSoundManager),
-        mStarField(pApplication, mTimeManager, mGraphicsManager,
-                   STAR_COUNT, mStarTexture),
-        mSpriteBatch(mTimeManager, mGraphicsManager) {
+        mStarField(pApplication, mTimeManager, mGraphicsManager, STAR_COUNT, mStarTexture),
+        mSpriteBatch(mTimeManager, mGraphicsManager),
+        mMoveableBody(pApplication, mInputManager, mPhysicsManager) {
     Log::info("Creating DroidBlaster");
 
     Sprite *shipGraphics = mSpriteBatch.registerSprite(mShipTexture, SHIP_SIZE, SHIP_SIZE);
@@ -68,6 +68,7 @@ status DroidBlaster::onActivate() {
     if (mSoundManager.start() != STATUS_OK) {
         return STATUS_KO;
     }
+    mInputManager.start();
 
     // Plays music and a sound at startup.
     mSoundManager.playBGM(mBGM);
@@ -75,6 +76,7 @@ status DroidBlaster::onActivate() {
     // Initializes game objects.
     mAsteroids.initialize();
     mShip.initialize();
+    mMoveableBody.initialize();
 
     mTimeManager.reset();
     return STATUS_OK;
@@ -92,6 +94,7 @@ status DroidBlaster::onStep() {
 
     // Updates modules.
     mAsteroids.update();
+    mMoveableBody.update();
 
     return mGraphicsManager.update();
 }

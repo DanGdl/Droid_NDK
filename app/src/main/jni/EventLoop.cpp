@@ -1,13 +1,15 @@
 #include "EventLoop.hpp"
 #include "Log.hpp"
 
-EventLoop::EventLoop(android_app *pApplication,
-                     ActivityHandler &pActivityHandler) :
+EventLoop::EventLoop(android_app *pApplication, ActivityHandler &pActivityHandler,
+                     InputHandler &pInputHandler) :
         mApplication(pApplication),
         mActivityHandler(pActivityHandler),
+        mInputHandler(pInputHandler),
         mEnabled(false), mQuit(false) {
     mApplication->userData = this;
     mApplication->onAppCmd = callback_appEvent;
+    mApplication->onInputEvent = callback_input;
 }
 
 void EventLoop::run() {
@@ -69,8 +71,7 @@ void EventLoop::deactivate() {
     }
 }
 
-void EventLoop::callback_appEvent(android_app *pApplication,
-                                  int32_t pCommand) {
+void EventLoop::callback_appEvent(android_app *pApplication, int32_t pCommand) {
     EventLoop &eventLoop = *(EventLoop *) pApplication->userData;
     eventLoop.processAppEvent(pCommand);
 }
@@ -121,4 +122,27 @@ void EventLoop::processAppEvent(int32_t pCommand) {
         default:
             break;
     }
+}
+
+int32_t EventLoop::callback_input(android_app *pApplication, AInputEvent *pEvent) {
+    EventLoop &eventLoop = *(EventLoop *) pApplication->userData;
+    return eventLoop.processInputEvent(pEvent);
+}
+
+int32_t EventLoop::processInputEvent(AInputEvent *pEvent) {
+    if (!mEnabled) {
+        return 0;
+    }
+
+    int32_t eventType = AInputEvent_getType(pEvent);
+    switch (eventType) {
+        case AINPUT_EVENT_TYPE_MOTION:
+            switch (AInputEvent_getSource(pEvent)) {
+                case AINPUT_SOURCE_TOUCHSCREEN:
+                    return mInputHandler.onTouchEvent(pEvent);
+                    break;
+            }
+            break;
+    }
+    return 0;
 }
