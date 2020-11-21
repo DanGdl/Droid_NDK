@@ -7,6 +7,9 @@
 #include <android_native_app_glue.h>
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
+#include <vector>
+#include <map>
+
 
 class GraphicsComponent {
 public:
@@ -81,16 +84,10 @@ private:
     GLfloat mProjectionMatrix[4][4];
 
     // Graphics resources.
-    TextureProperties mTextures[32];
-    int32_t mTextureCount;
-    GLuint mShaders[32];
-    int32_t mShaderCount;
-    GLuint mVertexBuffers[32];
-    int32_t mVertexBufferCount;
-
-//    GraphicsElement* mElements[1024]; int32_t mElementCount;
-    GraphicsComponent *mComponents[32];
-    int32_t mComponentCount;
+    std::map<Resource *, TextureProperties> mTextures;
+    std::vector<GLuint> mShaders;
+    std::vector<GLuint> mVertexBuffers;
+    std::vector<GraphicsComponent *> mComponents;
 
     // Rendering resources.
     GLint mScreenFrameBuffer;

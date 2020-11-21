@@ -10,13 +10,13 @@ Asteroid::Asteroid(android_app *pApplication, TimeManager &pTimeManager,
         mTimeManager(pTimeManager),
         mGraphicsManager(pGraphicsManager),
         mPhysicsManager(pPhysicsManager),
-        mBodies(), mBodyCount(0), mMinBound(0.0f),
+        mBodies(), mMinBound(0.0f),
         mUpperBound(0.0f), mLowerBound(0.0f),
         mLeftBound(0.0f), mRightBound(0.0f) {
 }
 
 void Asteroid::registerAsteroid(Location &pLocation, int32_t pSizeX, int32_t pSizeY) {
-    mBodies[mBodyCount++] = mPhysicsManager.loadBody(pLocation, pSizeX, pSizeY);
+    mBodies.push_back(mPhysicsManager.loadBody(pLocation, pSizeX, pSizeY));
 }
 
 void Asteroid::initialize() {
@@ -26,14 +26,17 @@ void Asteroid::initialize() {
     mLeftBound = -BOUNDS_MARGIN;
     mRightBound = (mGraphicsManager.getRenderWidth() + BOUNDS_MARGIN);
 
-    for (int32_t i = 0; i < mBodyCount; ++i) {
-        spawn(mBodies[i]);
+    std::vector<PhysicsBody *>::iterator bodyIt;
+    for (bodyIt = mBodies.begin(); bodyIt < mBodies.end(); ++bodyIt) {
+        spawn(*bodyIt);
     }
 }
 
 void Asteroid::update() {
-    for (int32_t i = 0; i < mBodyCount; ++i) {
-        PhysicsBody *body = mBodies[i];
+    std::vector<PhysicsBody *>::iterator bodyIt;
+    for (bodyIt = mBodies.begin(); bodyIt < mBodies.end(); ++bodyIt) {
+        PhysicsBody *body = *bodyIt;
+
         if ((body->location->x < mLeftBound)
             || (body->location->x > mRightBound)
             || (body->location->y < mLowerBound)
@@ -44,9 +47,10 @@ void Asteroid::update() {
 }
 
 void Asteroid::spawn(PhysicsBody *pBody) {
-    float velocity = -(RAND(VELOCITY_RANGE) + MIN_VELOCITY);
-    float posX = RAND(mGraphicsManager.getRenderWidth());
-    float posY = RAND(mGraphicsManager.getRenderHeight()) + mGraphicsManager.getRenderHeight();
+    const float velocity = -(RAND(VELOCITY_RANGE) + MIN_VELOCITY);
+    const float posX = RAND(mGraphicsManager.getRenderWidth());
+    const float posY =
+            RAND(mGraphicsManager.getRenderHeight()) + mGraphicsManager.getRenderHeight();
 
     pBody->velocityX = 0.0f;
     pBody->velocityY = velocity;

@@ -10,10 +10,7 @@ GraphicsManager::GraphicsManager(android_app *pApplication) :
         mDisplay(EGL_NO_DISPLAY), mSurface(EGL_NO_CONTEXT),
         mContext(EGL_NO_SURFACE),
         mProjectionMatrix(),
-        mTextures(), mTextureCount(0),
-        mShaders(), mShaderCount(0),
-        mVertexBuffers(), mVertexBufferCount(0),
-        mComponents(), mComponentCount(0),
+        mTextures(), mShaders(), mVertexBuffers(), mComponents(),
         mScreenFrameBuffer(0),
         mRenderFrameBuffer(0), mRenderVertexBuffer(0),
         mRenderTexture(0), mRenderShaderProgram(0),
@@ -27,7 +24,7 @@ GraphicsManager::~GraphicsManager() {
 }
 
 void GraphicsManager::registerComponent(GraphicsComponent *pComponent) {
-    mComponents[mComponentCount++] = pComponent;
+    mComponents.push_back(pComponent);
 }
 
 status GraphicsManager::start() {
@@ -121,12 +118,14 @@ status GraphicsManager::start() {
     Log::info("Viewport  : %d x %d", mScreenWidth, mScreenHeight);
     Log::info("Offscreen : %d x %d", mRenderWidth, mRenderHeight);
 
-    // Loads graphics components.
-    for (int32_t i = 0; i < mComponentCount; ++i) {
-        if (mComponents[i]->load() != STATUS_OK) {
+    // Loads graphics components. // std::vector<GraphicsComponent*>::iterator
+    for (auto componentIt = mComponents.begin();
+         componentIt < mComponents.end(); ++componentIt) {
+        if ((*componentIt)->load() != STATUS_OK) {
             return STATUS_KO;
         }
     }
+
     return STATUS_OK;
 
     ERROR:
@@ -210,22 +209,25 @@ status GraphicsManager::initializeRenderBuffer() {
 void GraphicsManager::stop() {
     Log::info("Stopping GraphicsManager.");
     // Releases textures.
-    for (int32_t i = 0; i < mTextureCount; ++i) {
-        glDeleteTextures(1, &mTextures[i].texture);
+    std::map<Resource *, TextureProperties>::iterator textureIt;
+    for (textureIt = mTextures.begin(); textureIt != mTextures.end(); ++textureIt) {
+        glDeleteTextures(1, &textureIt->second.texture);
     }
-    mTextureCount = 0;
 
     // Releases shaders.
-    for (int32_t i = 0; i < mShaderCount; ++i) {
-        glDeleteProgram(mShaders[i]);
+    std::vector<GLuint>::iterator shaderIt;
+    for (shaderIt = mShaders.begin(); shaderIt < mShaders.end(); ++shaderIt) {
+        glDeleteProgram(*shaderIt);
     }
-    mShaderCount = 0;
+    mShaders.clear();
 
     // Releases vertex buffers.
-    for (int32_t i = 0; i < mVertexBufferCount; ++i) {
-        glDeleteBuffers(1, &mVertexBuffers[i]);
+    std::vector<GLuint>::iterator vertexBufferIt;
+    for (vertexBufferIt = mVertexBuffers.begin();
+         vertexBufferIt < mVertexBuffers.end(); ++vertexBufferIt) {
+        glDeleteBuffers(1, &(*vertexBufferIt));
     }
-    mVertexBufferCount = 0;
+    mVertexBuffers.clear();
 
     // Releases offscreen rendering resources.
     // Vertex buffer and shader are released by the loops above.
@@ -261,9 +263,11 @@ status GraphicsManager::update() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Render graphic components.
-    for (int32_t i = 0; i < mComponentCount; ++i) {
-        mComponents[i]->draw();
+    std::vector<GraphicsComponent *>::iterator componentIt;
+    for (componentIt = mComponents.begin(); componentIt < mComponents.end(); ++componentIt) {
+        (*componentIt)->draw();
     }
+
 
     // The FBO is rendered and scaled into the screen.
     glBindFramebuffer(GL_FRAMEBUFFER, mScreenFrameBuffer);
@@ -315,12 +319,11 @@ void callback_readPng(png_structp pStruct, png_bytep pData, png_size_t pSize) {
 }
 
 TextureProperties *GraphicsManager::loadTexture(Resource &pResource) {
-    // Looks for the texture in cache first.
-    for (int32_t i = 0; i < mTextureCount; ++i) {
-        if (pResource == *mTextures[i].textureResource) {
-            Log::info("Found %s in cache", pResource.getPath());
-            return &mTextures[i];
-        }
+    // Looks for the texture in cache first. // std::map<Resource*, TextureProperties>::iterator
+    auto textureIt = mTextures.find(&pResource);
+    if (textureIt != mTextures.end()) {
+        Log::info("Found %s in cache", pResource.getPath());
+        return &textureIt->second;
     }
 
     Log::info("Loading texture %s", pResource.getPath());
@@ -457,7 +460,7 @@ TextureProperties *GraphicsManager::loadTexture(Resource &pResource) {
     Log::info("Texture size: %d x %d", width, height);
 
     // Caches the loaded texture.
-    textureProperties = &mTextures[mTextureCount++];
+    textureProperties = &mTextures[&pResource];
     textureProperties->texture = texture;
     textureProperties->textureResource = &pResource;
     textureProperties->width = width;
@@ -519,7 +522,7 @@ GLuint GraphicsManager::loadShader(const char *pVertexShader,
         goto ERROR;
     }
 
-    mShaders[mShaderCount++] = shaderProgram;
+    mShaders.push_back(shaderProgram);
     return shaderProgram;
 
     ERROR:
@@ -535,13 +538,15 @@ GLuint GraphicsManager::loadVertexBuffer(const void *pVertexBuffer,
     // Upload specified memory buffer into OpenGL.
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, pVertexBufferSize, pVertexBuffer,
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, pVertexBufferSize, pVertexBuffer, GL_STATIC_DRAW);
     // Unbinds the buffer.
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    if (glGetError() != GL_NO_ERROR) goto ERROR;
+    if (glGetError() != GL_NO_ERROR) {
+        goto ERROR;
+    }
 
-    mVertexBuffers[mVertexBufferCount++] = vertexBuffer;
+    mVertexBuffers.push_back(vertexBuffer);
+
     return vertexBuffer;
 
     ERROR:
