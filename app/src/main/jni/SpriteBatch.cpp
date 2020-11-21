@@ -129,7 +129,7 @@ void SpriteBatch::draw() {
             } else {
                 break;
             }
-        } while (canDraw = (++currentSprite < spriteCount));
+        } while ((canDraw = (++currentSprite < spriteCount)));
 
         // Renders sprites each time texture changes.
         glDrawElements(GL_TRIANGLES,

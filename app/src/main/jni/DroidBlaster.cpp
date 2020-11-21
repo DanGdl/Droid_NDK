@@ -71,6 +71,7 @@ status DroidBlaster::onActivate() {
 
     // Plays music and a sound at startup.
     mSoundManager.playBGM(mBGM);
+    mSoundManager.recordSound();
 
     // Initializes game objects.
     mAsteroids.initialize();
