@@ -46,7 +46,6 @@ DroidBlaster::DroidBlaster(android_app *pApplication) :
     b2Body *shipBody = mMoveableBody.registerMoveableBody(shipGraphics->location, SHIP_SIZE,
                                                           SHIP_SIZE);
     mShip.registerShip(shipGraphics, collisionSound, shipBody);
-    mMoveableBody.registerMoveableBody(shipGraphics->location, SHIP_SIZE, SHIP_SIZE);
 
     // Creates asteroids.
     for (int32_t i = 0; i < ASTEROID_COUNT; ++i) {
