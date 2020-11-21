@@ -10,7 +10,7 @@ public:
     MoveableBody(android_app *pApplication,
                  InputManager &pInputManager, PhysicsManager &pPhysicsManager);
 
-    PhysicsBody *registerMoveableBody(Location &pLocation, int32_t pSizeX, int32_t pSizeY);
+    b2Body *registerMoveableBody(Location &pLocation, int32_t pSizeX, int32_t pSizeY);
 
     void initialize();
 
@@ -24,7 +24,8 @@ private:
     PhysicsManager &mPhysicsManager;
     InputManager &mInputManager;
 
-    PhysicsBody *mBody;
+    b2Body *mBody;
+    b2MouseJoint *mTarget;
 };
 
 #endif

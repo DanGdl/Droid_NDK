@@ -43,7 +43,9 @@ DroidBlaster::DroidBlaster(android_app *pApplication) :
     shipGraphics->setAnimation(SHIP_FRAME_1, SHIP_FRAME_COUNT, SHIP_ANIM_SPEED, true);
 
     Sound *collisionSound = mSoundManager.registerSound(mCollisionSound);
-    mShip.registerShip(shipGraphics, collisionSound);
+    b2Body *shipBody = mMoveableBody.registerMoveableBody(shipGraphics->location, SHIP_SIZE,
+                                                          SHIP_SIZE);
+    mShip.registerShip(shipGraphics, collisionSound, shipBody);
     mMoveableBody.registerMoveableBody(shipGraphics->location, SHIP_SIZE, SHIP_SIZE);
 
     // Creates asteroids.
@@ -70,6 +72,7 @@ status DroidBlaster::onActivate() {
         return STATUS_KO;
     }
     mInputManager.start();
+    mPhysicsManager.start();
 
     // Plays music and a sound at startup.
     mSoundManager.playBGM(mBGM);
@@ -96,6 +99,10 @@ status DroidBlaster::onStep() {
     // Updates modules.
     mAsteroids.update();
     mMoveableBody.update();
+    mShip.update();
+    if (mShip.isDestroyed()) {
+        return STATUS_EXIT;
+    }
 
     return mGraphicsManager.update();
 }

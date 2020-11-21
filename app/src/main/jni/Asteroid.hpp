@@ -25,13 +25,13 @@ private:
 
     void operator=(const Asteroid &);
 
-    void spawn(PhysicsBody *pBody);
+    void spawn(b2Body *pBody);
 
     TimeManager &mTimeManager;
     GraphicsManager &mGraphicsManager;
     PhysicsManager &mPhysicsManager;
 
-    std::vector<PhysicsBody *> mBodies;
+    std::vector<b2Body *> mBodies;
     float mMinBound;
     float mUpperBound;
     float mLowerBound;
