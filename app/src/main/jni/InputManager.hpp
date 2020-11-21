@@ -2,9 +2,10 @@
 #define _PACKT_INPUTMANAGER_HPP_
 
 #include "GraphicsManager.hpp"
+#include "Configuration.hpp"
 #include "InputHandler.hpp"
-#include "Types.hpp"
 
+#include "Types.hpp"
 #include <android_native_app_glue.h>
 
 class InputManager : public InputHandler {
@@ -22,6 +23,15 @@ public:
 protected:
     bool onTouchEvent(AInputEvent *pEvent);
 
+    bool onKeyboardEvent(AInputEvent *pEvent);
+
+    bool onTrackballEvent(AInputEvent *pEvent);
+
+    bool onAccelerometerEvent(ASensorEvent *pEvent);
+
+    void toScreenCoord(screen_rot pRotation, ASensorVector *pCanonical, ASensorVector *pScreen);
+
+
 private:
     InputManager(const InputManager &);
 
@@ -35,6 +45,8 @@ private:
     float mDirectionX, mDirectionY;
     // Reference point to evaluate touch distance.
     Location *mRefPoint;
+    screen_rot mRotation;
+
 };
 
 #endif
